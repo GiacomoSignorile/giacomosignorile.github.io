@@ -1,0 +1,5 @@
+title: ML Notes
+description: Machine learning notes l
+theme: minima
+plugins:
+  - jekyll-feed
