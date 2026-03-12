@@ -1,5 +1,20 @@
-title: ML Notes
-description: Machine learning notes l
+title: Giacomo Signorile - github.io
+email: giacomo.sig@outlook.it
+description: >- # this means to ignore newlines until "baseurl:"
+  A curated collection of research notes, implementation logs, and deep dives 
+  into the world of Machine Learning and AI.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://giacomosignorile.github.io" # the base hostname & protocol for your site
+twitter_username: giacomosignorile
+github_username:  giacomosignorile
+
+# Build settings
 theme: minima
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
+
+# Custom settings
+author: Giacomo Signorile
+social_links:
+  github: https://github.com/giacomosignorile
