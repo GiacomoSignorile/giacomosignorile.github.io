@@ -17,6 +17,277 @@ Browse through my latest thoughts and research summaries on:
 - **Large Language Models (LLMs)**
 - **Reinforcement Learning**
 
+# 1. INTRODUCTION
+
+Nella pPROGARAMMAZIONE NORMALE, presi in input DATI e REGOLE generiamo un OUTPUT. Nella PROGRAMMAZIONE LOGICA, presi in input DATI e OUTPUT generiamo REGOLE. Nella MACHINE LEARNING, presi in input DATI e OUTPUT generiamo un MODELLO. I modelli di ML sono sistemi in grado di sviluppare loro il modo di risolvere un problema, a partire da esempi di input e output. Il modello impara a generalizzare, cioè a fare previsioni su dati nuovi, non visti durante il training, basandosi sui pattern appresi dai dati di training e sul loro comportamento.
+
+## PARADIGMI DI MACHINE LEARNING
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         PARADIGMI DI MACHINE LEARNING                        │
+└──────┬───────────────────────────────┬───────────────────────────────┬──────┘
+       │                               │                               │
+┌──────▼─────────────────┐     ┌───────▼───────────────┐     ┌─────────▼─────────────┐
+│   SUPERVISED LEARNING  │     │ REINFORCEMENT LEARNING│     │ UNSUPERVISED LEARNING │
+│ (Conosce l'output per  │     │ (Cerca di massimiz-   │     │ (Cerca pattern        │
+│  ogni esempio input)   │     │  zare un PAYOFF)      │     │  nell'input)          │
+└──────┬─────────────────┘     └───────────────────────┘     └─────────┬─────────────┘
+       │                                                               │
+       ├─► CLASSIFICATION                                              ├─► CLUSTERING
+       │   (Output [1,N], label)                                       │   (Gruppi relazionati)
+       │                                                               │
+       ├─► REGRESSION                                                  ├─► ANOMALY DETECTION
+       │   (Output in ℝ)                                               │   (Differenze tra dati)
+       │                                                               │
+       └─► ORDINAL REGRESSION                                          └─► ASSOCIATION
+           (Output ordinato,                                               (Es: consigli acquisti)
+            es: stelle TripAdvisor)
+
+<br/>
+<details>
+<summary><strong>Tabella paradigmi (Markdown)</strong></summary>
+
+| Paradigma                | Descrizione                        | Esempi principali           |
+|--------------------------|------------------------------------|----------------------------|
+| Supervised Learning      | Conosce l'output per ogni input    | Classification, Regression, Ordinal Regression |
+| Unsupervised Learning    | Cerca pattern nell'input           | Clustering, Anomaly Detection, Association     |
+| Reinforcement Learning   | Massimizza un payoff               | -                          |
+
+</details>
+
+## CLASSIFICATION
+
+L'OBIETTIVO è trovare un modo per mappare ogni Xi del training set a una classe Yi. 
+Con yi ∈ {1, ...., C} (C classi) e xi ∈ ℝ^d (d feature).
+se C = 2 → CLASSIFICAZIONE BINARIA
+se C > 2 → CLASSIFICAZIONE MULTI-CLASSE
+se le CLASSI NON SONO MUTUAMENTE ESCLUSIVE → CLASSIFICAZIONE MULTI-LABEL (es: classificare un film in più generi)
+
+L'obiettivo è fare una predizione corretta su un nuovo input. Per disambiguare meglio, il modello deve ritornare una distribuzione di probabilità sulle classi possibili. 
+Quindi consideriamo come predizione $$\hat{y} = \text{ARGMAX}_{c=1}^{C} \ P(y=c \mid x, D)$$
+D is the training data, x is the new input
+
+Il SUPERVISED LEARNING p una CONDITIONAL DENSITY ESTIMATION
+
+UNSUPERVISED LEARNING:
+Cerco un modelo nella forma P(X_i| theta) che spiega i dati osservati. quindi si tratta di una UNCONDITIONAL DENSITY ESTIMATION.
+
+Un esempio è il CLUSTERING
+Se k denota il numero di cluster:
+1° Obiettivo (fase di training): stimare la distribuzione degli elementi di training sul numero di cluster k
+2° Obiettivo (uso del modello): stimare a quale cluster appartiene un nuovo elemento x, cioè stimare P(k|x)
+
+K = ARGMAX_{k} P(k|D) 
+z_i = argmax_{k} P(Z_i = k | x_i, D) k identifica il cluster in particolare.
+
+CONCETTI DI BASE:
+
+MODELLI PARAMETRICI o NON-PARAMETRICI
+Se un modello ha un numero finito di parametri, allora è un modello PARAMETRICO(più veloci). Se invece ha un numero di parametri che cresce con la quantità di dati, allora è NON-PARAMETRICO(più flessibili).
+
+Esempio di NON-PARAMETRIC MODEL: KNN (K-NEAREST NEIGHBORS CLASSSIFIER)
+- Non ha parametri da stimare, ma memorizza tutto il training set
+Classifcatore che guarda ai K punti nel vicinato di X.
+La probabilità che la classe di output sia C noto l'input x è data da:
+P(y=C|x,D,K) = (1/K) * sum_{i=1}^{K} 1(y_i = C)
+
+Esempio di PARAMETRIC MODEL: LINEAR REGRESSION
+Funzione lineare sull'input del tipo Y(X) = w^Tx + ε, w è la matrice dei parametri
+
+OVERFITTING: quando un modello è troppo complesso e si adatta troppo bene ai dati di training, perdendo la capacità di generalizzare a nuovi dati.
+UNDERFITTING: quando un modello è troppo semplice e non riesce a catturare
+OPTIMAL MODEL COMPLEXITY: il punto in cui il modello è abbastanza complesso da catturare i pattern nei dati, ma non così complesso da adattarsi al rumore.
+
+# 2. MODEL EVALUATION
+
+## EVALUATION
+Utile a capire quale modello funziona meglio sul task
+
+Validare l'errore sul TRAINING SET non è un buon indicatore sui dati FUTURI, questo è detto RESUBSTITUION ERROR, non ci dà info sull'OVERFIT ma ce le dà sull'UNDERFIT. Quindi è comunque utile conoscerlo quindi ci serve un TEST-SET indipendente -> instanze simili al training-set, ma che non compaiono nel learning process.
+
+Le procedure migliori sono TRE SETS:
+- TRAINING SET: usato per addestrare il modello
+- VALIDATION SET: usato per scegliere il modello migliore tra quelli addestrati
+- TEST SET: usato per stimare l'errore del modello scelto sui dati futuri
+
+Presi tutti i dati che abbiamo, per dividerli tra training e test possiamo fare: 
+HOLDOUT: dividere il set in 2/3 per il training e 1/3 per il test
+STRATIFIED SAMPLING: dividere il set in modo che la distribuzione delle classi sia simile tra training e test
+REPEATED HOLDOUT METHOD: facciamo più cicli dove dividiamo a caso 2/3 e 1/3, addestriamo il modello e valutiamo l'errore sul test, alla fine facciamo la media degli errori.
+
+K-FOLD CROSS VALIDATION: dividiamo il set in K fold mantenendo la distribuzione delle classi, addestriamo il modello su K-1 fold e valutiamo l'errore sul fold rimanente, ripetiamo per tutti i fold e alla fine facciamo la media degli errori.
+
+LEAVE-ONE-OUT CROSS VALIDATION: è un caso particolare di K-FOLD con K = N (numero di istanze), addestriamo il modello su tutte le istanze tranne una e valutiamo l'errore su quella rimanente, ripetiamo per tutte le istanze e alla fine facciamo la media degli errori. Considerando N elemetni nel dataset, consiste nel fare N iterazioni usando 1 elemneto come TEST (sempre diverso) e N-1 elementi per il train. E' computazionalmente costoso e non è possibile stratificare i fold, ma è utile quando abbiamo pochi dati.
+
+BOOTRAP o BOOTSTRAP O,632
+
+Presi N elementi del dataset, faccio N pesche con rimessa.
+Ad ogni pesca, se l'elemento non è nel train-set, lo aggiungo, altrimenti non faccio niente. Statisticamente dopo N pesche dovremmo avere il 65,2% degli elementi del training-set, gli altri nel test-set. La procuedura va ripetuta più volte e alla fine si fa la media dei risultati.
+Dato che il train è effettuato su pochi elementi, lo consideriamo nel calcolo dell'errore:
+err=0.632 * err_test + 0.368 * err_train
+
+## SELEZIONE DEGLI IPERPARAMETRI
+Gli iperparametri sono parametri che fanno della fase di learning e quindi devono essere ottimizzati usando i dati di TRAIN, Per cui facciamo un'ulteriore divisione del training-set, in train e validation.
+Es: per stimare K ottimale nella K-NN,
+1) dopo aver diviso in TRAIN e VAL, PER OGNI K, addestriamo il modello sul TRAIN e valutiamo l'errore sul VAL
+2) Trainiamo il modello con K ottimale su tutto il TRAIN e valutiamo l'errore sul TEST
+
+Se il dataset è troppo piccolo da poter essere splittato un'altra volta, si può considerare una nested cross validation, quindi uno sula suddivisione TEST-TRAIN, e uno sulla suddivisione TRAIN-VAL. (Computazionalmente costososissimo)
+
+## INTERVALLO DI CONFIDENZA
+Ci serve stimare l'intervallo di confidenza dell'errore stimato rispetto a quello effettivo, Ovviamente questo intervallo dipende dal numero di elementi nel test-set, presi N provem di cui S successi, ci interessa definire l'intervallo a cui appartiene il true success rate p invece il success rate f = S/N <- f è una variabile aleatoria con media p e varianza p(1-p)/N per N grande a piacere F segue una Distribuzione Normale, All'aumentare di N, si rimpicciolisce l'intervallo, quindi possiamo stimare l'intervallo di confidenza al 95% con la formula:
+
+All'aumentare di $N$, si rimpicciolisce l'intervallo di confidenza.Definito una confidenza desiderata $c$ (di solito 90/98 %), trovo il valore di $z$ associato da qui:
+| $\text{Pr}[X \ge z]$ | $z$ | $c$ |
+| :--- | :--- | :--- |
+| 0.1% | 3.09 | 99.8% |
+| 0.5% | 2.58 | 99% |
+| 1% | 2.33 | 98% |
+| **5%** | **1.65** | **90%** |
+| 10% | 1.28 | 80% |
+| 20% | 0.84 | 60% |
+| 40% | 0.25 | 20% |
+E applico questa formula:
+$$p = \frac{\left( f + \frac{z^2}{2N} \pm z \sqrt{\frac{f}{N} - \frac{f^2}{N} + \frac{z^2}{4N^2}} \right)}{\left( 1 + \frac{z^2}{N} \right)}$$
+$p$ apparterrà a questo intervallo.
+
+## CONFRONTO DI SCHEMI DI LEARNING
+E' difficile definire quale di due LEARNING SCHEMERS perfoma meglio.
+Anche usando la 10-fold cross validation, comunque non sappiamo se i risultati sono affidabili
+Abbiamo bisogno di un SIGNIFICANCE TEST, test che misura quanta confindenza c'è nel dire che non c'è differenza nei due LEARNING SCHEMAS, o che uno è migliore dell'altro.
+
+PAIRED T-TEST
+
+Confronto due learning scheme confrontando le MEAN AVERAGE ACCURACY, presi {X_i}_i=0^k e {Y_i}_i=0^k, output dei due modelli, calcoliamo mx e my: le loro medie.
+Come visto prima, per K sufficientemente garande, la differenza tra le medie segue una distribuzione normale, Calcoliamo m_d = mx - my, e la varianza della differenza tra le medie, m_d standardizzato è chiamato t-statistic: t= m_d / sqrt(sigma_d^2 / K) 
+Presa z dalla tabella di prima, considerando la confidenza che vogliono Se t <= -z v t >= z: la differenza è significativa tra i due learning scheme, altrimenti non è significativa.
+
+## COME CALCOLARE LE PERFORMANCE DI UN CLASSIFICATORE
+Considreiamo p1, ..., pK le probabilità generate su una classificazione rispetto alle K classi
+
+*QUADRATIC LOSS* Considera tutte le probabilità stimate.
+$$\sum_{j \neq c} p_j^2 + (1 - p_c)^2 \in [0, 2]$$
+
+- $\sum_{j \neq c} p_j^2$: Contributo di tutte le predizioni sbagliate.
+- $(1 - p_c)^2$: Contributo della predizione corretta.
+
+**INFORMATIONAL LOSS**: Si basa solo sulla stima di probabilità della classe corretta.
+$$-\log_2(p_c) \in [0, +\infty]$$
+$p_c$: Probabilità predetta sulla classe corretta.
+
+## Criteri di valutazione (Classificazione)
+
+### Confusion Matrix
+
+|                   | Classe Predetta: Vero | Classe Predetta: Falso |
+|-------------------|:--------------------:|:---------------------:|
+| **Classe Effettiva: Vero**  | <span style="color:green">True Positive (TP)</span>  | <span style="color:red">False Negative (FN)</span>  |
+| **Classe Effettiva: Falso** | <span style="color:red">False Positive (FP)</span>   | <span style="color:green">True Negative (TN)</span>  |
+
+---
+
+### Valori importanti
+
+- **True Positive Rate (TPR):** $TPR = \frac{TP}{TP + FN}$
+- **False Negative Rate (FNR):** $FNR = \frac{FN}{TP + FN}$
+- **True Negative Rate (TNR):** $TNR = \frac{TN}{TN + FP}$
+- **False Positive Rate (FPR):** $FPR = \frac{FP}{TN + FP}$
+- **Overall Success Rate:** $SuccR = \frac{TP + TN}{TP + TN + FP + FN}$
+- **Error Rate:** $1 - SuccR$
+
+---
+
+### Metriche principali
+
+- **Precision:**
+  $$
+  	ext{Precision} = \frac{TP}{TP + FP}
+  $$
+  Elementi predetti come positivi, tra tutti quelli effettivamente positivi.
+
+- **Recall:**
+  $$
+  	ext{Recall} = \frac{TP}{TP + FN}
+  $$
+  Elementi predetti come positivi, tra tutte le predizioni.
+
+- **$F_1$-measure:**
+  $$
+  F_1 = \frac{2 \cdot \text{Recall} \cdot \text{Precision}}{\text{Recall} + \text{Precision}}
+  $$
+  Se alto, Precision e Recall sono alti.
+
+- **$F_\beta$-measure:**
+  $$
+  F_\beta = \frac{(1 + \beta^2) \cdot \text{Recall} \cdot \text{Precision}}{\text{Recall} + \beta^2 \cdot \text{Precision}}
+  $$
+  Generalizza $F_1$-measure.
+
+---
+
+# MATRICE DI COSTO
+
+**es.**
+
+| CLASSE EFFETTIVA \ CLASSE PREDETTA | VERO | FALSO |
+| :--- | :---: | :---: |
+| **FALSO** | 0 | 1 |
+| **VERO** | 2 | 0 |
+
+> *Nota:* dò un costo più alto alle FP rispetto alle FN. SE CORRETTA IL COSTO È 0.
+
+Ciò ci porta a prendere le predizioni che minimizzano il costo.
+In realtà raramente si ha idea di quali siano i costi da assegnare.
+Per stimarli usiamo i:
+
+## LIFT CHART
+Ho lo scopo di definire un sottoinsieme del test-set con la proporzione di istanze positive maggiore possibile.
+
+![alt text](image.png)
+*   **Asse Y:** Number of respondents (0 to 1000)
+*   **Asse X:** Sample size (0% to 100%)
+*   *Annotazioni sul grafico:*
+    *   Punto (100%, 1000) $\leftarrow$ **ideale**
+    *   Punto sulla curva $\leftarrow$ **giusto TRADE-OFF**
+
+## ROC CURVE
+...
+
+---
+
+# VALUTAZIONE SU PREDIZIONI NUMERICHE
+*(es. REGRESSION)*
+
+In questo caso gli errori non sono PRESENTI o ASSENTI, ma hanno una misura.
+Considerando $\{a_i\}_{i=0}^n$ come **GROUND TRUTH** e $\{p_i\}_{i=0}^n$ come **VALORI PREDETTI**, misuriamo gli errori con:
+
+> *Nota:* $\bar{a}$ e $p$ del training set — PARLIAMO DI LOSS
+
+## ERRORI ASSOLUTI
+$\leftarrow$ che non considerano se sono state fatte 2 o 2000 predizioni
+
+### MEAN-SQUARED ERROR or MEAN-SQUARED LOSS
+$$\frac{(p_1 - a_1)^2 + \dots + (p_n - a_n)^2}{n}$$
+
+### ROOT MEAN-SQUARED ERROR
+$$\sqrt{\frac{(p_1 - a_1)^2 + \dots + (p_n - a_n)^2}{n}}$$
+
+### MEAN ABSOLUTE ERROR
+$$\frac{|p_1 - a_1| + \dots + |p_n - a_n|}{n}$$
+
+---
+
+## ERRORI RELATIVI
+$\bar{a}$ è il valore medio sui dati di train
+
+### RELATIVE SQUARED ERROR
+$$\frac{(p_1 - a_1)^2 + \dots + (p_n - a_n)^2}{(a_1 - \bar{a})^2 + \dots + (a_n - \bar{a})^2}$$
+
+### ROOT RELATIVE SQUARED ERROR
+$$\sqrt{\frac{(p_1 - a_1)^2 + \dots + (p_n - a_n)^2}{(a_1 - \bar{a})^2 + \dots + (a_n - \bar{a})^2}}$$
+
+### RELATIVE ABSOLUTE ERROR
+$$\frac{|p_1 - a_1| + \dots + |p_n - a_n|}{|a_1 - \bar{a}| + \dots + |a_n - \bar{a}|}$$
 
 # 9. NEURAL NETWORKS
 
