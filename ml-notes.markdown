@@ -1,5 +1,6 @@
 ---
-layout: home
+layout: math
+mathjax: true
 title: ML Notes
 permalink: /ml-notes/
 ---
@@ -288,6 +289,67 @@ $$\sqrt{\frac{(p_1 - a_1)^2 + \dots + (p_n - a_n)^2}{(a_1 - \bar{a})^2 + \dots +
 
 ### RELATIVE ABSOLUTE ERROR
 $$\frac{|p_1 - a_1| + \dots + |p_n - a_n|}{|a_1 - \bar{a}| + \dots + |a_n - \bar{a}|}$$
+
+# 3. REGRESSION
+(QUI VEDIAMO LA LEAST SQUARE REGRESSION)
+
+I Task che consistono nel predirre un output continuo, anche se limitato
+
+Si tratta di SUPERVISED LEARNING, per cui consideriamo un set di input X^(i) di cui conosciamo gli f^(i) output reali detti TRAINING EXAMPLES
+
+Vogliono approssimare una funzione che rappresenti la relazione tra x e t,  (x è un vettore (features) t scalare)
+Per farlo ci serve una LOSS che ci dia quanto bene il modello approssima i dati di training, e un OPTIMIZER che ci dica come modificare i parametri del modello per minimizzare la loss.
+t(x) = f(x) + ε, ε è un errore casuale con media 0 e varianza σ^2
+
+la funzione f(x) sarà del tipo f(x) = w_0 + w_1 x dove w_0 è bias e w_1 è il peso associato alla feature x, e w = (w_0, w_1) è il vettore dei parametri da stimare.
+Un esempio di loss è la SUM OF SQUARED  VERTICAL ERROR:
+
+$$l(w) = \sum_{n=1}^{N} [t^{(n)} - (w_0 + w_1 x^{(n)})]^2$$
+
+cioè la somma di tutte le linee verdi al quadrato del grafico, che rappresentano la distanza verticale tra i punti di training e la retta di regressione.
+![alt text](image-1.png)
+
+Noi cerchiamo w che minimizza questa loss, e per farlo usiamo un OPTIMIZER, ad esempio il GRADIENT DESCENT, che ci dice di modificare w in direzione opposta al gradiente della loss:
+## GRADIENT DESCENT METHOD
+$$w \leftarrow w - \lambda \frac{\partial l}{\partial w}$$
+Lambda è il learning rate, deve esse basso per convergere piano piano
+
+Possiamo applicare questo metodo in due modi:
+1. BATCH UPDATES
+Somma tutti gli updates su tutti gli elementi di train e poi cambia il valore di w
+$$
+w \leftarrow w + 2\lambda \sum_{n=1}^{N} (t^{(n)} - y(x^{(n)}))x^{(n)}
+$$
+Comuptazionalemente costoso, ma generalizza meglio
+
+2. STOCHASTIC UPDATES
+Aggiorna w ogni volta che vede un elemento di train
+
+$$
+	ext{for } i \in \text{range}(N): \quad w \leftarrow w + 2\lambda (t^{(i)} - y(x^{(i)}))x^{(i)}
+$$
+
+MODELLO LINEARE CON FUNZIONE POLINOMIALE
+$$
+y(x, w) = w_0 + \sum_{j=1}^{M} w_j x^j
+$$
+$\leftarrow$ funzione non lineare su $X$ ma lineare su $w$ $\Rightarrow$ modello lineare.
+
+## GENERALIZATION
+da applicare per evitare l'overfitting, nel caso di primacon M=9 il modello non generalizza bene, mentre con M=2 generalizza meglio, anche se non approssima bene i dati di train, ma è più robusto su dati nuovi.
+
+Quando un modello OVERFIT, i suoi pesi tendono ad essere MOLTO GRANDI, quindi per evitarlo, dobbiamo incoraggiare il modello a usare pesi piccoli,
+ ciò è chiamato
+## REGULARIZATION
+Valore che cresce al crescere di dimensione dei pesi, da aggiungere alla loss, in modo che il modello tenda a usare pesi piccoli per ridurre la loss.
+
+$$
+l(w) = \sum_{n=1}^{N} [t^{(n)} - (w_0 + w_1 x^{(n)})]^2 + \alpha \|w\|^2
+$$
+
+$\sum_{n=1}^{N} [\ldots ]^2$: Somma degli errori quadratici verticali.
+$\alpha \|w\|^2$: REGOLARIZZATORE (Regolarizzazione $L_2$ o Ridge).
+$\alpha$: è l'iperparametro che decidiamo noi per decidere l'importanza del regularizer.
 
 # 9. NEURAL NETWORKS
 
