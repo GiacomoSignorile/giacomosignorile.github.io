@@ -1,6 +1,5 @@
 ---
 layout: math
-mathjax: true
 title: ML Notes
 permalink: /ml-notes/
 ---
@@ -244,7 +243,7 @@ Per stimarli usiamo i:
 ## LIFT CHART
 Ho lo scopo di definire un sottoinsieme del test-set con la proporzione di istanze positive maggiore possibile.
 
-![alt text](image.png)
+![Lift Chart](/assets/img/image.png)
 *   **Asse Y:** Number of respondents (0 to 1000)
 *   **Asse X:** Sample size (0% to 100%)
 *   *Annotazioni sul grafico:*
@@ -307,7 +306,7 @@ Un esempio di loss è la SUM OF SQUARED  VERTICAL ERROR:
 $$l(w) = \sum_{n=1}^{N} [t^{(n)} - (w_0 + w_1 x^{(n)})]^2$$
 
 cioè la somma di tutte le linee verdi al quadrato del grafico, che rappresentano la distanza verticale tra i punti di training e la retta di regressione.
-![alt text](image-1.png)
+![Regression Error](/assets/img/image-1.png)
 
 Noi cerchiamo w che minimizza questa loss, e per farlo usiamo un OPTIMIZER, ad esempio il GRADIENT DESCENT, che ci dice di modificare w in direzione opposta al gradiente della loss:
 ## GRADIENT DESCENT METHOD
@@ -351,6 +350,65 @@ $\sum_{n=1}^{N} [\ldots ]^2$: Somma degli errori quadratici verticali.
 $\alpha \|w\|^2$: REGOLARIZZATORE (Regolarizzazione $L_2$ o Ridge).
 $\alpha$: è l'iperparametro che decidiamo noi per decidere l'importanza del regularizer.
 
+# 4. CLASSIFICATION
+
+Consiste nell'assegnare ad un input vector uno di un set finito di LABELS 
+Tipi di clasisficazione:
+- Binary classification: due classi, output 0 o 1 yes or no
+- Multiclass classification: più di due classi, output in {1, 2, ..., C}
+- Multilabel classification: più classi, ma non mutuamente esclusive, output in {0, 1}^C
+Approcci alla classificazione:
+1. APPROCCIO DISCRIMINATIVO: stima direttamente P(y|x) o una funzione di decisione f(x) che mappa x a y
+2. APPROCCIO GENERATIVO: stima P(x|y) e P(y), poi usa Bayes per calcolare P(y|x)
+
+## CLASSIFICAZIONE BINARIA(LINEARE)
+$$y(x) = f(w^T x + w_0)$$
+- $w^T$: pesi
+- $x$: input
+- $w_0$: bias
+- $f$: ACTIVATION FUNCTION (non lineare)
+Nota: Al contrario dei modelli di regressione, non è lineare su $W$ a causa dell'ACTIVATION FUNCTION.
+
+se X è espresso da 1 feature, il classificatore sarà un THRESHOLD
+2 feature, una linea
+3 feature, un piano
+/> 4 un iperpiano
+Una volta definito l'activation function, ci serve trovare w e w_0, che distinguono bene le due classi, qundi ci serve una
+LOSS FUNCTION
+Cioè una funzione che dice l'errore commesso prevedendo y qyando la classe corretta è t, esempi: 
+1. ZERO/ONE LOSS $$L_{0-1}(y(x), t) = \begin{cases} 0 & \text{if } y(x) = t \\ 1 & \text{if } y(x) \neq t \end{cases}$$Difficile da minimizzare.
+2. ASYMMETRIC BINARY LOSS $$L_{ABL}(y(x), t) = \begin{cases} \alpha & \text{if } y(x)=1 \land t=0 \\ \beta & \text{if } y(x)=0 \land t=1 \\ 0 & \text{if } y(x)=t \end{cases}$$Dà valori diversi a seconda dell'errore commesso.
+3. SQUARED QUADRATIC LOSS $$L_{\text{squared}}(y(x), t) = (t - y(x))^2$$4. ABSOLUTE ERROR $$L_{\text{absolute}}(y(x), t) = |t - y(x)|$$  
+
+Il problema si dice LINEARLY SEPARABLE se riusciamo a separare le classi con un classificatore lineare.
+Se non riusciamo a separare le classi le cause sono:
+- Non ci basta un classificatore lineare, ci serve un classificatore non lineare
+- L'input è troppo rumoroso, quindi non è possibile separare le classi, in questo caso ci serve un classificatore che sia robusto al rumore.
+- L'output della GROUND TRUTH è errato, quindi non è possibile separare le classi, in questo caso ci serve un classificatore che sia robusto al rumore.
+- Ci servono più feature in input
+
+## METRICHE DI CLASSIFICAZIONE
+- **Accuracy**: $\frac{TP + TN}{TP + TN + FP + FN}$
+- **Precision**: $\frac{TP}{TP + FP}$
+- **Recall**: $\frac{TP}{TP + FN}$
+Similar to Regression, anche per la classificazione è importante evitare l'overfitting, quindi dobbiamo regolarizzare il modello, ad esempio con la REGOLARIZZAZIONE L2, che aggiunge alla loss un termine che penalizza i pesi grandi:
+
+# 5. NON-PARAMETRIC MODELS: KNN
+Modelli la cui dimensione dipende dalla quantità di dati, più dati abbiamo, più parametri ha il modello. KNN è un esempio di modello non parametrico, che memorizza tutto il training set e classifica un nuovo input x guardando i K punti più vicini a x nel training set e prendendo la classe più frequente tra questi K punti.
+Si chiamano LAZY LEARNERS perché non fanno nulla durante la fase di training, ma solo durante la fase di test, quando devono classificare un nuovo input.
+
+## 1-NN
+Trova la classe di X cercando l'esempio più vicino a X nel training set e prendendo la sua classe. Non è molto robusto al rumore, perché se l'esempio più vicino è un outlier, la classificazione sarà errata.
+ad esempio con la DISTANZA EUCLIDEA, la distanza tra due punti x e y è data da:
+$$d(x, y) = \sqrt{\sum_{i=1}^{n} (x_i - y_i)^2}$$
+
+x* = argmin_{x_i} d(x, x_i)
+
+x* è l'esempio più vicino a x, e la sua classe è la classe predetta per x.
+deduciamo che y = t*, dove t* è la classe dell'esempio più vicino x*.
+VORONOI DIAGRAM
+Ci permettte di visualizzare la decision boundary del classificatore 1-NN, che è data dai punti che sono equidistanti da due o più esempi del training set. Questi punti formano una linea (o un iperpiano) che separa le classi.
+
 # 9. NEURAL NETWORKS
 
 Questa sezione raccoglie appunti e spiegazioni sulle reti neurali artificiali, con attenzione a chiarezza, esempi pratici e formule matematiche. Ideale per studenti e appassionati di ML.
@@ -366,7 +424,7 @@ Una rete neurale artificiale (ANN) è un modello di machine learning ispirato al
 - **Funzione di attivazione**: introduce non linearità
 - **Bias**: valore che regola la soglia di attivazione
 
-<img src="/assets/img/Pasted%20image%2020260317220324.png" alt="neurone artificiale" width="350"/>
+![Neurone artificiale](/assets/img/Pasted%20image%2020260317220324.png)
 
 ---
 
@@ -404,7 +462,7 @@ Un MLP ha almeno un **hidden layer**. L'output dipende dagli output degli hidden
 **Teorema dell'approssimazione universale:**
 Una rete con un hidden layer può approssimare qualsiasi funzione continua con errore arbitrariamente piccolo.
 
-<img src="/assets/img/Pasted%20image%2020260317221606.png" alt="MLP" width="400"/>
+![MLP](/assets/img/Pasted%20image%2020260317221606.png)
 
 **Iperparametri:**
 - Numero di neuroni e layer
@@ -670,7 +728,14 @@ Il **negative sampling** è una tecnica per generare esempi negativi (triplette 
 - Insieme di **alberi decisionali** addestrati su sottoinsiemi diversi dei dati e delle feature.
 - Ogni albero vota per la classe; la classe finale è quella più votata (classificazione) o la media (regressione).
 - Vantaggi: robustezza, riduzione dell'overfitting, gestione di dati rumorosi.
+A **Random Forest** is a highly effective **ensemble learning algorithm** that builds upon the concepts of bagging (bootstrap aggregating) and randomization. 
 
+**How it Works**
+The algorithm constructs a "forest" by building a large ensemble of randomized decision trees. To create this ensemble, it explicitly tries to decorrelate the individual trees (the base learners) by introducing randomness in two key ways:
+*   **Data Randomization (Bagging):** Each decision tree is trained on a randomly chosen subset of the available data cases. A randomized decision tree is built in each iteration of the bagging algorithm.
+*   **Feature Randomization (Random Subspaces):** Instead of evaluating all possible features to find the best split at each node, the algorithm learns trees based on a **randomly chosen subset of input variables**. This approach is directly related to the random subspaces method for constructing an ensemble of classifiers.
+* Performance 
+By combining these randomization techniques, Random Forests generate diverse models whose noise tends to cancel out, resulting in **very good predictive accuracy** and excellent overall predictors. However, because it builds many complex trees, one minor drawback is that the algorithm can be fairly slow to train compared to simpler models.
 ---
 
 ## Decision Tree
@@ -679,7 +744,26 @@ Il **negative sampling** è una tecnica per generare esempi negativi (triplette 
 - Ogni nodo interno rappresenta una decisione su una feature; ogni foglia una classe o valore.
 - Algoritmi comuni: CART, ID3, C4.5.
 - Criteri di split: **Gini**, entropia, varianza.
+A **decision tree** is a machine learning representation created through a "divide-and-conquer" approach to learning from a set of independent instances. It maps an input to a predicted output by applying a sequence of simple tests, making them easy to interpret as they correspond to a sequence of decisions applied to individual input variables.
 
+**Structure and Classification Process**
+*   **Nodes and Tests:** Each internal node in a decision tree involves testing a particular attribute. For a nominal attribute, the node typically branches for each possible value. For a numeric attribute, the test usually determines whether the value is greater or less than a predetermined constant, resulting in a two-way split, though three-way or multi-way splits are also possible. 
+*   **Leaves:** The terminal nodes, or leaf nodes, assign a classification that applies to all instances reaching that leaf, or occasionally a probability distribution over possible classifications. If the tree is designed to predict numeric quantities rather than categories, it is called a **regression tree** (where leaves contain average numeric values) or a **model tree** (where leaves contain linear regression models).
+*   **Routing:** To classify an unknown instance, it is routed down the tree from the root, following the branches that correspond to the instance's attribute values, until a leaf is reached and the classification is assigned.
+
+**Constructing the Tree**
+Decision trees are usually built using a top-down, recursive divide-and-conquer algorithm:
+1.  **Select an Attribute:** An attribute is chosen for the root node, and branches are made for its possible values. To determine the best attribute, the algorithm evaluates which choice will produce the "purest" daughter nodes. This is typically calculated using an entropy-based measure called **information gain**. Because information gain naturally biases the model toward highly branching attributes (like unique ID codes), a modified metric called the **gain ratio** is often used to compensate by taking the size and number of branches into account.
+2.  **Split the Data:** The training examples are divided into subsets according to their values for the chosen attribute.
+3.  **Recurse:** The process repeats recursively for each branch, using only the subset of instances that actually reach it. The process terminates when all instances at a node have the exact same classification (a completely pure node), or when the data cannot be split any further.
+
+**Handling Missing Values**
+If an instance has an unknown value for a tested attribute, the algorithm can notionally split the instance into pieces. Each piece is sent down a different branch and is assigned a numeric weight proportional to the number of training instances that took that specific branch.
+
+**Pruning to Prevent Overfitting**
+A fully expanded decision tree will often overfit the training data, meaning it follows the data too slavishly and learns noise, resulting in poor generalization to independent test sets. To resolve this, trees undergo a simplification process called **pruning**. While prepruning attempts to stop the tree from growing early, most systems rely on postpruning. Common postpruning operations include:
+*   **Subtree replacement:** Selecting a subtree and replacing it entirely with a single leaf node.
+*   **Subtree raising:** Replacing an internal node with an entire subtree that was located below it.
 ---
 
 ## Logistic Regression
@@ -694,6 +778,26 @@ $$
 - Loss: **log-loss** (cross-entropy)
 - Può essere regolarizzata (L1, L2)
 
+**Logistic regression** is a highly popular statistical and machine learning technique that, despite its name, is specifically designed for **classification rather than regression** tasks. It is predominantly used for binary classification, where the goal is to categorize an input into one of two distinct classes (e.g., 0 or 1) by estimating the probability of class membership.
+
+**The Logit Transform and Sigmoid Function**
+Standard linear regression is poorly suited for predicting probabilities because a linear function can easily output values below 0 or above 1. Logistic regression solves this issue by building a linear model based on a transformed target variable. 
+*   It uses the **logit transformation**, which calculates the log-odds ratio: $\log(p / (1 - p))$,. The resulting values can span from negative infinity to positive infinity, allowing them to be approximated accurately by a linear combination of the input attributes.
+*   Equivalently, the linear output is passed through a non-linear **logistic sigmoid function** (often called a "squashing function"), mathematically defined as $\sigma(x) = 1 / (1 + \exp(-x))$,. This transforms the raw linear score into a value strictly confined to the (0, 1) interval, which can be seamlessly interpreted as a valid **conditional probability**,.
+
+**Linear Decision Boundary**
+In a two-class logistic regression model, the decision boundary lies exactly where the predicted probability is 0.5. This 0.5 threshold occurs exactly when the underlying linear sum of the attributes equals zero ($w_0 + w_1a_1 + ... + w_ka_k = 0$),. Because this relies on a linear equality, the resulting decision surface separating the classes is a **flat, linear hyperplane** in the instance space,.
+
+**Training and Optimization**
+Unlike simple linear regression, logistic regression **does not have a closed-form mathematical solution** to instantly calculate the optimal parameter weights,. 
+*   **Loss Function:** Instead of minimizing the squared error, the algorithm determines the optimal weights by **maximizing the log-likelihood** of the training data, which is equivalent to minimizing the negative log-likelihood or **cross-entropy error function**,,. 
+*   **Iterative Algorithms:** Fortunately, the cross-entropy error function is convex and possesses a unique global minimum,. Thus, the optimal weights can be found reliably using iterative numerical optimization procedures. Common techniques include **gradient descent**, or second-order methods like **Iteratively Reweighted Least Squares (IRLS)**, which is based on the Newton-Raphson scheme,.
+
+**Preventing Overfitting**
+Logistic regression can exhibit severe overfitting if the training data is perfectly linearly separable. Under standard maximum likelihood estimation, the algorithm will attempt to drive the weights to infinity to create a perfectly steep "step function," resulting in a brittle model,. To mitigate this, practitioners usually employ **regularization (such as an $L_2$ weight decay penalty)** or adopt a Bayesian approach (MAP estimation) that applies a prior distribution to encourage smaller, more stable coefficients.
+
+* Multiclass Extensions
+Although fundamentally a binary classifier, logistic regression can be generalized to handle multiple classes. This can be achieved by training separate classifiers for each pair of classes (pairwise classification) and combining their votes, or by using a mathematical generalization known as the **softmax function** (or normalized exponential) to yield a unified multinomial logistic regression model,.
 ---
 
 ## Che problema risolve Gini
@@ -708,6 +812,19 @@ $$
 
 dove $p_i$ è la proporzione di elementi della classe $i$ nel nodo.
 
+The **Gini index** (often called Gini impurity) is a metric used by decision tree learning algorithms, such as CART, to evaluate and select the best attribute for splitting data. 
+
+Specifically, the Gini index resolves the limitations of using a simple misclassification rate when growing decision trees by providing a superior measure of **node impurity**. It resolves these limitations in two primary ways:
+
+*   **Sensitivity to Node Purity:** The Gini index is much more sensitive to changes in class probabilities than the raw misclassification rate. It actively encourages the formation of pure regions—nodes where a high proportion of the data points belong to a single class. For example, if two different dataset splits yield the exact same overall misclassification rate, but one split successfully creates a perfectly "pure" node (containing only one class), the Gini index will correctly favor the split that isolates the pure node.
+*   **Differentiability:** Unlike the misclassification rate, the Gini index is a differentiable function, which makes it far better suited for gradient-based optimization methods used to evaluate splits during tree construction.
+
+**How it Works**
+Mathematically, the Gini index is calculated as $1 - \sum_c \hat{\pi}_c^2$ (or equivalently $\sum_{c=1}^C \hat{\pi}_c(1-\hat{\pi}_c)$), where $\hat{\pi}_c$ represents the proportion of instances at that node that belong to class $c$. 
+
+*   This formula effectively calculates the **expected error rate** at a given node: $\hat{\pi}_c$ is the probability that a random entry in the leaf belongs to class $c$, and $(1-\hat{\pi}_c)$ is the probability that it would be misclassified.
+*   The index evaluates to $0$ (vanishes) when a node is perfectly pure (meaning the probability of a class is either $0$ or $1$), indicating zero impurity.
+*   It reaches its maximum value (e.g., $0.5$ in a two-class problem) when the classes are perfectly evenly mixed, indicating maximum impurity.
 ---
 
 ## Regolarizzazione
@@ -721,6 +838,26 @@ dove $p_i$ è la proporzione di elementi della classe $i$ nel nodo.
 $$
 L = L_{data} + \lambda \sum_j w_j^2
 $$
+Regularization refers to any modification made to a machine learning algorithm intended to reduce its generalization error (its performance on unseen data) without necessarily reducing its training error,. Its primary goal is to prevent **overfitting**—a scenario where a high-capacity model memorizes the noise and specific details of the training data but fails to generalize to new inputs—by controlling the model's effective complexity,,,. 
+
+**How it Works**
+Regularization generally operates by trading a slight increase in model bias for a significant reduction in variance. Rather than strictly limiting the model's mathematical capacity (such as restricting a neural network to fewer layers), regularization incorporates a preference for certain types of solutions, such as simpler functions with smaller parameter weights,. 
+
+From a probabilistic perspective, many regularization techniques are equivalent to Maximum A Posteriori (MAP) Bayesian inference. In this view, the regularization penalty corresponds to a prior probability distribution over the model's parameters, restricting the learning algorithm based on prior beliefs before any data is even observed,,.
+
+**Common Regularization Strategies**
+There are many forms of regularization available to practitioners, including:
+
+*   **Parameter Norm Penalties:** This involves adding a mathematical penalty term to the objective or cost function to discourage the model's coefficients from reaching large values,.
+    *   **L2 Regularization (Weight Decay or Ridge Regression):** Adds a penalty based on the squared magnitude of the weights. This shrinks weights closer to the origin and is mathematically equivalent to assuming a Gaussian prior on the parameters,,,.
+    *   **L1 Regularization (Lasso):** Adds a penalty based on the sum of the absolute values of the weights. Unlike L2, L1 regularization naturally induces **sparse** solutions where many parameters are driven exactly to zero, making it an effective mechanism for automatic feature selection,,,. This corresponds to applying a Laplace prior,.
+*   **Early Stopping:** During iterative training, the model's error on an independent validation set is continuously monitored. Training is halted when the validation error stops improving and begins to rise,. This unobtrusive method restricts the optimization to a smaller volume of the parameter space and has been shown to behave mathematically similarly to L2 regularization.
+*   **Dataset Augmentation:** Expanding the training set by generating synthetic data through transformations (e.g., randomly translating, rotating, or flipping images). This forces the model to generalize to variations it hasn't explicitly seen,.
+*   **Noise Injection:** Adding noise to the input data, the hidden units, or the model weights during training. It can also be applied to the output targets (a technique known as label smoothing) to prevent the model from pursuing extremely confident, hard probabilities,.
+*   **Dropout:** A technique specifically for neural networks where neurons are randomly turned off (set to zero) during training. This prevents neurons from co-adapting too strongly to specific training cases and effectively forces the network to behave like an ensemble of exponentially many smaller, robust subnetworks,.
+*   **Parameter Sharing and Tying:** Forcing sets of parameters to be equal across different parts of a model. This is famously used in Convolutional Neural Networks (CNNs) to dramatically lower the number of unique parameters and reduce the memory footprint without sacrificing expressive power.
+*   **Adversarial Training:** Training the model on intentionally constructed, perturbed "adversarial" examples. This discourages the network from being overly sensitive to tiny, linear changes in the input, encouraging the model to be locally constant in the neighborhood of the training data,.
+*   **Representational Sparsity:** Placing a penalty on the *activations* of the units in a neural network rather than its weight parameters, encouraging the internal representations of the data to be sparse (containing mostly zeros),.
 
 ---
 
@@ -730,6 +867,19 @@ $$
 - Può usare kernel per separare dati non linearmente separabili.
 - Loss: **hinge loss**
 
+A **Support Vector Machine (SVM)** is a highly influential supervised learning algorithm primarily used for classification, though it can also be adapted for regression tasks. Despite its name, it is an algorithm rather than a physical machine.
+
+Its defining feature is its ability to **use simple linear models to implement complex, nonlinear class boundaries**. It achieves this by mathematically transforming the input data into a new, often higher-dimensional space where a straight line (or flat hyperplane) can separate the different classes.
+
+Here are the core mechanisms that make the SVM work:
+
+*   **The Maximum Margin Hyperplane:** When data is linearly separable, there might be multiple lines that can divide the classes. The SVM algorithm specifically searches for the maximum margin hyperplane—the boundary that gives the greatest possible separation (or margin) between the classes, coming no closer to either group than it absolutely has to.
+*   **Support Vectors and Sparsity:** The training data points that lie closest to this maximum margin hyperplane are called **support vectors**. These specific points uniquely define the decision boundary; in fact, all other training instances are irrelevant and could be deleted without changing the model's outcome. Because the final model relies on only this small subset of the data, SVMs are known for producing highly **sparse solutions**.
+*   **The Kernel Trick:** Transforming data into high-dimensional feature spaces to find boundaries can be incredibly computationally expensive. SVMs bypass this using a mathematical shortcut known as the **kernel trick**. This technique allows the algorithm to implicitly calculate relationships (dot products) in the high-dimensional space while actually performing the computations in the original, low-dimensional space. Common kernel functions include the polynomial kernel, the radial basis function (RBF) or Gaussian kernel, and the sigmoid kernel.
+*   **Soft Margins for Overlapping Data:** In most real-world scenarios, classes overlap, meaning a perfect separation would force the model to overfit to noise. SVMs resolve this by relaxing the hard boundary into a **"soft margin"**. By introducing "slack variables," the model allows some training points to fall inside the margin or even be misclassified. A user-specified regularization parameter (usually denoted as $C$) controls the trade-off between minimizing these training errors and keeping the margin as wide as possible.
+*   **Support Vector Regression:** When applied to numeric prediction, the algorithm is called Support Vector Regression. Instead of minimizing squared error like standard linear regression, it creates an **$\epsilon$-insensitive "tube"** around the regression function. The model completely ignores any prediction errors that fall within this tube's width ($2\epsilon$), only penalizing points that lie outside of it, which once again results in a sparse model. 
+
+* In practice, training an SVM is a constrained quadratic optimization problem, which guarantees that any local solution found by the algorithm is also a global optimum.
 ---
 
 ## Feedforward Neural Network
@@ -739,4 +889,35 @@ $$
 - Ogni neurone calcola una combinazione pesata degli input, applica una funzione di attivazione e passa il risultato al layer successivo.
 - Non ha memoria (a differenza delle RNN).
 
+A **feedforward neural network**, also widely known as a **multilayer perceptron (MLP)**, is the quintessential deep learning model designed to approximate a target mathematical function. 
+
+**Core Characteristics:**
+*   **Feedforward Information Flow:** These models are called "feedforward" because information flows in strictly one direction. It starts at the input $x$, passes through intermediate computations, and finally reaches the output $y$. Unlike recurrent neural networks, feedforward networks have no feedback connections that loop the model's outputs back into itself.
+*   **Network Composition:** They are called "networks" because they are formed by composing many different, simpler mathematical functions together. This is typically represented as a directed acyclic graph in a chain structure. For instance, a network with three functions would be chained together to form $f(x) = f^{(3)}(f^{(2)}(f^{(1)}(x)))$.
+*   **Neural Inspiration:** The term "neural" reflects their loose inspiration from biological neuroscience. The network's layers are vector-valued, and each individual element within a vector can be thought of as an artificial "neuron". Each neuron receives inputs from many other units, computes its own activation value—typically by applying an affine (linear) transformation followed by a fixed, non-linear activation function like a rectified linear unit (ReLU)—and passes the signal forward.
+
+**Layer Architecture:**
+*   **Input and Output Layers:** The first function in the chain is the first layer (which receives the raw input), and the final function in the chain forms the **output layer** (which produces the final prediction).
+*   **Hidden Layers:** The intermediate functions between the input and output are called **hidden layers**. They are "hidden" because the training data does not explicitly tell the network what the output of these specific layers should be. Instead, the learning algorithm must automatically determine how to use and adapt these hidden units to extract increasingly complex features from the data to best implement the final prediction.
+
+---
+
+## CNN
+
+A **Convolutional Neural Network (CNN)** is a specialized type of feedforward neural network designed for processing data that has a known, grid-like topology, such as 1D time-series data or 2D image data. It distinguishes itself from standard neural networks by using a mathematical operation called **convolution** in place of general matrix multiplication in at least one of its layers.
+
+CNNs are highly effective because they leverage three core architectural ideas:
+*   **Sparse Interactions:** In a traditional fully connected neural network, every output unit interacts with every input unit. In a CNN, the network uses filters (or kernels) that are much smaller than the overall input. This means neurons only process a small, localized spatial region (a "receptive field"), which drastically reduces memory requirements and improves computational efficiency.
+*   **Parameter Sharing (Tied Weights):** Rather than learning a separate set of parameters for every single location in an input, a CNN uses the exact same kernel across all positions of the input. This allows the network to learn a feature (like an edge or a corner) once and detect it anywhere in the image, significantly reducing the number of unique parameters the model must store.
+*   **Equivariant Representations:** Because the same weights are scanned across the entire input, the convolutional layer is inherently equivariant to translation. If an object shifts in the input image, its corresponding feature representation will shift by the exact same amount in the output feature map.
+
+**Typical CNN Architecture**
+A standard layer within a CNN generally consists of three sequential stages:
+1.  **Convolution Stage:** The layer applies multiple learnable filters in parallel to the input to produce a set of linear activations, often called feature maps.
+2.  **Detector Stage:** A nonlinear activation function, commonly a Rectified Linear Unit (ReLU), is applied element-wise to these linear activations.
+3.  **Pooling Stage:** The output is modified by a pooling function, which replaces the network's output at a certain location with a summary statistic of the nearby outputs (such as the maximum value in a rectangular neighborhood, known as **max-pooling**, or the average value). Pooling downsamples the spatial resolution and makes the model's representation **approximately invariant to small translations**. This means the network learns to care more about *whether* a feature is present rather than its exact pixel-perfect location.
+
+In a complete CNN, the input is usually subjected to multiple repeating phases of these convolution, nonlinearity, and pooling operations. As the data moves deeper into the network, the receptive fields become larger, allowing the network to combine simple features (like edges) into highly complex, abstract features (like entire object parts). Finally, the resulting spatial feature maps are typically flattened into a vector and fed into a fully connected feedforward network (multilayer perceptron) to make the final classification or prediction.
+
+* Notably, this design is heavily inspired by neuroscientific models of the mammalian primary visual cortex (V1), mapping closely to how biological "simple cells" detect local features and "complex cells" provide invariance to small shifts.
 ---
